@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <script type="text/javascript"
+          src="https://www.gstatic.com/charts/loader.js">
+  </script>
+  <script type="text/javascript"
+          src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment-with-locales.js">
+  </script>
+  <script type="text/javascript"
+          src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.js">
+  </script>
+  <script type="text/javascript"
+          src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.21/moment-timezone-with-data.js">
+  </script>
+  <script
+			  src="https://code.jquery.com/jquery-3.3.1.min.js"
+			  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			  crossorigin="anonymous">
+  </script>
+
+  <link rel="stylesheet"
+        type="text/css"
+        href="mystyle.css">
+  <link rel="stylesheet"
+        type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <title>Financial Data</title>
+</head>
+
+<body>
+  <form id="form">
+    Symbol:
+    <input id="symbol" type="text" name="symbol" value="SPX">
+    <input id="button1" type="click" value="Daily Data">
+  </form>
+
+  <span id="layout">
+    <span class="loTitle">
+      <h2>Alphavantage Financial Data</h2>
+    </span>
+    <span class="loButtons">
+<!--  <button id="button1" autofocus>Daily data</button> -->
+      <button id="button2">Sector data</button>
+   </span>
+    <span class="loMeta">
+      <span id="symbolMeta"></span>
+    </span>
+    <span class="loGlobal">
+      <span id="symbolGlobal"></span>
+    </span>
+    <span class="loCol1">
+      <span id="symbolChart"></span>
+    </span>
+    <span class="loChart">
+      <span id="chart_div"></span>
+    </span>
+    <span class="loCol2">
+      <span id="symbolOverview"></span>
+    </span>
+    <span class="loTable">
+      <span id="symbolDetail"></span>
+    </span>
+  </span>
+
+  <script>
+    "use strict";
+//
+// https://www.w3schools.com/colors/colors_names.asp
+//
+    const COLOR_BG_CHARTAREA     = "#f2f2f2"; //Gray95- HSL	0.00	0.00	0.95
+    const COLOR_BG_PAGEAREA      = "#DCDCDC"; //Gainsboro - HSL	0.00	0.00	0.86
+    const COLOR_GRIDLINES        = "#a6a6a6"; //Gray65 - HSL	0.00	0.00	0.65
+    const COLOR_MINOR_GRIDLINES  = "#cccccc"; //Gray80 - HSL	0.00	0.00	0.80
+//
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+//
+    const HTTP_STATUS_OK = 200;
+    const HTTP_STATUS = new Map();
+    HTTP_STATUS.set(0  , " ");
+    HTTP_STATUS.set(200, "OK");
+    HTTP_STATUS.set(1  , "Informational");
+    HTTP_STATUS.set(100, "Continue");
+    HTTP_STATUS.set(101, "Switching Protocols");
+    HTTP_STATUS.set(102, "Processing");
+    HTTP_STATUS.set(2  , "Success");
+    HTTP_STATUS.set(200, "OK");
+    HTTP_STATUS.set(201, "Created");
+    HTTP_STATUS.set(202, "Accepted");
+    HTTP_STATUS.set(203, "Non-authoritative Information");
+    HTTP_STATUS.set(204, "No Content");
+    HTTP_STATUS.set(205, "Reset Content");
+    HTTP_STATUS.set(206, "Partial Content");
+    HTTP_STATUS.set(207, "Multi-Status");
+    HTTP_STATUS.set(208, "Already Reported");
+    HTTP_STATUS.set(226, "IM Used");
+    HTTP_STATUS.set(3  , "Redirection");
+    HTTP_STATUS.set(300, "Multiple Choices");
+    HTTP_STATUS.set(301, "Moved Permanently");
+    HTTP_STATUS.set(302, "Found");
+    HTTP_STATUS.set(303, "See Other");
+    HTTP_STATUS.set(304, "Not Modified");
+    HTTP_STATUS.set(305, "Use Proxy");
+    HTTP_STATUS.set(307, "Temporary Redirect");
+    HTTP_STATUS.set(308, "Permanent Redirect");
+    HTTP_STATUS.set(4  , "Client Error");
+    HTTP_STATUS.set(400, "Bad Request");
+    HTTP_STATUS.set(401, "Unauthorized");
+    HTTP_STATUS.set(402, "Payment Required");
+    HTTP_STATUS.set(403, "Forbidden");
+    HTTP_STATUS.set(404, "Not Found");
+    HTTP_STATUS.set(405, "Method Not Allowed");
+    HTTP_STATUS.set(406, "Not Acceptable");
+    HTTP_STATUS.set(407, "Proxy Authentication Required");
+    HTTP_STATUS.set(408, "Request Timeout");
+    HTTP_STATUS.set(409, "Conflict");
+    HTTP_STATUS.set(410, "Gone");
+    HTTP_STATUS.set(411, "Length Required");
+    HTTP_STATUS.set(412, "Precondition Failed");
+    HTTP_STATUS.set(413, "Payload Too Large");
+    HTTP_STATUS.set(414, "Request-URI Too Long");
+    HTTP_STATUS.set(415, "Unsupported Media Type");
+    HTTP_STATUS.set(416, "Requested Range Not Satisfiable");
+    HTTP_STATUS.set(417, "Expectation Failed");
+    HTTP_STATUS.set(418, "I'm a teapot");
+    HTTP_STATUS.set(421, "Misdirected Request");
+    HTTP_STATUS.set(422, "Unprocessable Entity");
+    HTTP_STATUS.set(423, "Locked");
+    HTTP_STATUS.set(424, "Failed Dependency");
+    HTTP_STATUS.set(426, "Upgrade Required");
+    HTTP_STATUS.set(428, "Precondition Required");
+    HTTP_STATUS.set(429, "Too Many Requests");
+    HTTP_STATUS.set(431, "Request Header Fields Too Large");
+    HTTP_STATUS.set(444, "Connection Closed Without Response");
+    HTTP_STATUS.set(451, "Unavailable For Legal Reasons");
+    HTTP_STATUS.set(499, "Client Closed Request");
+    HTTP_STATUS.set(5  , "Server Error");
+    HTTP_STATUS.set(500, "Internal Server Error");
+    HTTP_STATUS.set(501, "Not Implemented");
+    HTTP_STATUS.set(502, "Bad Gateway");
+    HTTP_STATUS.set(503, "Service Unavailable");
+    HTTP_STATUS.set(504, "Gateway Timeout");
+    HTTP_STATUS.set(505, "HTTP Version Not Supported");
+    HTTP_STATUS.set(506, "Variant Also Negotiates");
+    HTTP_STATUS.set(507, "Insufficient Storage");
+    HTTP_STATUS.set(508, "Loop Detected");
+    HTTP_STATUS.set(510, "Not Extended");
+    HTTP_STATUS.set(511, "Network Authentication Required");
+    HTTP_STATUS.set(599, "Network Connect Timeout Error");
+//
+// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/readyState
+//
+    const READYSTATE_DONE = 4;
+    const READYSTATE = new Map();
+    READYSTATE.set(0  , "UNSENT - Client has been created. open() not called yet");
+    READYSTATE.set(1  , "OPENED - Client has been created, open() has been called");
+    READYSTATE.set(2  , "HEADERS_RECEIVED - Send() has been called, and headers and status are available");
+    READYSTATE.set(3  , "LOADING - Downloading; responseText holds partial data");
+    READYSTATE.set(4  , "DONE - The operation is complete.");
+//
+// used to format the Google Charts
+//
+    const MAX_DAYS_ON_CHART = 30;
+    const HEIGHT_300 = 300;
+    const WIDTH_100_PC = '100%';
+//
+// used in Alphavantage API call
+//
+    const FUNCT_DAILY = "TIME_SERIES_DAILY_ADJUSTED";
+    const OUTPUTSIZE = "compact";
+    const APIKEY = "VXVZ832BHZSU19JR";
+//
+//
+//
+    document.getElementById('button1').addEventListener('click', loadDaily);
+    document.getElementById('button2').addEventListener('click', loadSector);
+
+    function JSONToCSVConvertor(JSONData, reportTitle, showLabel)
+    {
+      //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+      function capitalizeFirstLetter(string)
+      {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+
+      var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+
+      var csvContent = '';
+      //Set Report title in first row or line
+      csvContent += reportTitle + '\r\n\n';
+      //This condition will generate the Label/Header (capitalized)
+      if (showLabel)
+      {
+        var rowInCSV = "";
+        //This loop will extract the label from 1st index of on array
+        for (var index in arrData[0])
+        {
+            //Now convert each value to string and comma-seprated
+            rowInCSV += capitalizeFirstLetter(index) + ',';
+        }
+        rowInCSV = rowInCSV.slice(0, -1);
+        //append Label row with line break
+        csvContent += rowInCSV + '\r\n';
+      }
+      //1st loop is to extract each row
+      for (var i = 0; i < arrData.length; i++)
+      {
+        var rowInCSV = "";
+        //2nd loop will extract each column and convert it in string comma-seprated
+        for (var index in arrData[i])
+        {
+          rowInCSV += '"' + arrData[i][index] + '",';
+        }
+        rowInCSV.slice(0, rowInCSV.length - 1);
+          //remove last comma
+        csvContent += rowInCSV + '\r\n';
+          //add a line break after each row
+      }
+
+      if (csvContent == "")
+      {
+        alert("Invalid data");
+        return;
+      }
+
+      //Generate a file name
+      var fileName = "";
+      fileName += "MyReport_" + reportTitle.replace(/ /g,"_") + "_" + moment().format("DD-MM-YYYY_HH.mm.ss");
+        //this will remove the blank-spaces from the title and replace it with an underscore and append timestamp
+      document.getElementById("downloadtekst").innerHTML = "Overview US Sector Performance";
+      document.getElementById("downloadtekst").href = encodeURI('data:text/csv;charset=utf-8,' + csvContent);
+      document.getElementById("downloadtekst").download = fileName + ".csv";
+      document.getElementById("fa_icon").href = encodeURI('data:text/csv;charset=utf-8,' + csvContent);
+      document.getElementById("fa_icon").download = fileName + ".csv";
+    }
+
+    function myFunction(x) {
+        if (x.matches) { // If media query matches
+            document.body.style.backgroundColor = "white";
+        } else {
+            document.body.style.backgroundColor = "lightgray";
+        }
+    }
+
+    var x = window.matchMedia("(min-width: 700px)")
+    myFunction(x) // Call listener function at run time
+    x.addListener(myFunction) // Attach listener function on state changes
+
+    function log(xhr, eventType, info)
+    {
+        var evInfo = eventType;
+
+        if (info)
+        {
+          evInfo += " - " + info;
+        }
+
+        evInfo += "\n" +
+          ">>>HTML Status: " + xhr.status + "/" + HTTP_STATUS.get(xhr.status) + "/" + xhr.statusText+ "\n" +
+          ">>>readyState : " + xhr.readyState + " " + READYSTATE.get(xhr.readyState);
+        console.log(evInfo);
+    }
+
+    function loadDaily()
+    {
+      console.log(">>>>>>loadDaily");
+      var dataAaTSDA = new XMLHttpRequest();
+
+      dataAaTSDA.addEventListener("readystatechange", function()
+        { log(dataAaTSDA, ">>>readystatechange") });
+      dataAaTSDA.addEventListener("loadstart", function(ev)
+        { log(dataAaTSDA, ">>>loadstart", ev.lengthComputable + " / " + ev.loaded + " of " + ev.total) });
+      dataAaTSDA.addEventListener("progress", function(ev)
+        { log(dataAaTSDA, ">>>progress", ev.lengthComputable + " / " + ev.loaded + " of " + ev.total) });
+      dataAaTSDA.addEventListener("abort", function()
+        { log(dataAaTSDA, ">>>abort") });
+      dataAaTSDA.addEventListener("error", function()
+        { log(dataAaTSDA, ">>>error") });
+      dataAaTSDA.addEventListener("timeout", function(ev)
+        { log(dataAaTSDA, ">>>timeout", ev.lengthComputable + "/" + ev.loaded + " of " + ev.total) });
+      dataAaTSDA.addEventListener("loadend", function(ev)
+        { log(dataAaTSDA, ">>>loadend", ev.lengthComputable + "/" + ev.loaded + " of " + ev.total) });
+
+      var apiCallURL = "";
+      apiCallURL +=
+        'https://www.alphavantage.co/query?function=' +
+        FUNCT_DAILY +
+        '&outputsize=' +
+        OUTPUTSIZE +
+        '&symbol=' +
+        document.getElementById('symbol').value +
+        '&apikey=' +
+        APIKEY;
+
+      dataAaTSDA.open('GET', apiCallURL, true);
+
+      log(dataAaTSDA, ">>>open (GET)");
+
+      dataAaTSDA.addEventListener("load", function()
+      {
+        log(dataAaTSDA, ">>>load");
+
+        if (this.status === HTTP_STATUS_OK &&
+            this.readyState === READYSTATE_DONE)
+        {
+          var geg = JSON.parse(this.responseText);
+          console.log(geg);
+
+          if (geg.hasOwnProperty('Information'))
+          {
+            document.getElementById('symbolMeta').innerHTML = ">>> " + geg['Information'];
+            document.getElementById('symbolGlobal').innerHTML = ""
+            document.getElementById('symbolDetail').innerHTML = "";
+            document.getElementById('symbolChart').innerHTML = "";
+            document.getElementById('symbolOverview').innerHTML = "";
+            document.getElementById('chart_div').outerHTML= "<span id='chart_div'></span>";
+          }
+          else if (geg.hasOwnProperty('Error Message'))
+          {
+            document.getElementById('symbolMeta').innerHTML = ">>> " + geg['Error Message'];
+            document.getElementById('symbolGlobal').innerHTML = ""
+            document.getElementById('symbolDetail').innerHTML = "";
+            document.getElementById('symbolChart').innerHTML = "";
+            document.getElementById('symbolOverview').innerHTML = "";
+            document.getElementById('chart_div').outerHTML= "<span id='chart_div'></span>";
+          }
+          else
+          {
+            document.getElementById('chart_div').outerHTML= "<span id='chart_div'></span>";
+            var symbol = geg['Meta Data']['2. Symbol'];
+            var info = geg['Meta Data']["1. Information"];
+            var last = geg['Meta Data']['3. Last Refreshed'];
+            var timeZone = geg['Meta Data']["5. Time Zone"];
+            var datums = geg['Time Series (Daily)'];
+
+            var usEastern  = moment.tz(last,timeZone);
+              // lees datum in als US/Eastern Time
+              //aan de hand van @last en @timeZone uit JSON
+            if (usEastern.isValid())
+            {
+              console.log("Input time US/ET       : ", usEastern.format("ddd MMM DD YYYY HH:mm:ss ZZ"));
+              console.log("Input time UTC         : ", usEastern.utc().format("ddd MMM DD YYYY HH:mm:ss ZZ"));
+              var brussels   = usEastern.clone().tz("Europe/Brussels");
+                // Converteer de datum naar Brussel IN EEN KOPIE
+              console.log("Input time Brussels    : ", brussels.format("ddd MMM DD YYYY HH:mm:ss ZZ"));
+              console.log("Local timezone         : ", moment.tz.guess());
+              var local = usEastern.clone().tz(moment.tz.guess());
+                // Detecteer de locale settings van de gebruiker / server
+                // Converteer de datum naar lokale tijd IN EEN KOPIE
+              console.log("Input local timeout    : ", local.format("ddd MMM DD YYYY HH:mm:ss ZZ"));
+              console.log("Current time local     : ", moment().format("ddd MMM DD YYYY HH:mm:ss ZZ"));
+            };
+
+            var outputChartHeader = '';
+            outputChartHeader +=
+              '<span id="png">' +
+              '</span>';
+
+            var outputOverviewHeader = '';
+            var apiCallCSV = '';
+            apiCallCSV = apiCallURL + '&datatype=csv';
+            outputOverviewHeader +=
+//            '<a id="downloadtekst" href="https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=SPX&apikey=VXVZ832BHZSU19JR&datatype=csv">Daily Time Series</a>' + ' ' +
+              '<a id="downloadtekst" href=' + apiCallCSV + '>Daily Time Series' +
+              '</a>' +
+              ' ' +
+              '<a id="fa_icon" href=' + apiCallCSV + '>' +
+                '<i class="fa fa-file-excel-o">' +
+                '</i>' +
+              '</a>';
+                //icoon geeft een excel-bestand weer en is aanklikbaar om de csv-download te starten
+
+            var outputMeta = '';
+            outputMeta +=
+              '<span class="symbolMeta">' +
+                '<ul>' +
+                  '<li>' +
+                    '<span>Symbol: </span>' + symbol +
+                  '</li>' +
+                  '<li>' +
+                    '<span>Last update (input Alphavantage): </span>' + local.format("DD-MM-YYYY") +
+                  '</li>' +
+                  '<li>' +
+                    '<span>Last screen refresh: </span>' + moment().format("DD-MM-YYYY HH:mm:ss") +
+                  '</li>'
+                '</ul>' +
+              '</span>';
+
+            var outputGlobal = '';
+            outputGlobal +=
+              '<span class="symbolGlobal normal">' +
+                '<ul>' +
+                  '<li>' +
+                    '<span>Information: </span>' + info +
+                  '</li>' +
+                '</ul>' +
+              '</span>';
+//
+//use of grid (CSS) to format table of detailed information
+//instead of table (HTML)
+//
+            var outputDetail = '';
+            outputDetail +=
+              '<span id="titelContainerDaily">' +
+                '<span>Datum</span>'  +
+                '<span>Low</span>'    +
+                '<span>High</span>'   +
+                '<span>Open</span>'   +
+                '<span>Close</span>'  +
+                '<span>AdjCl</span>'  +
+                '<span>Div</span>'    +
+              '</span>'               +
+              '<span id="wrapperDaily">';
+
+            var cnt = 1;
+            var datum = '';
+            for (datum in datums)
+            {
+              var open      = datums[datum]['1. open'];
+              var open2dec  = parseFloat(open).toFixed(2);
+              var high      = datums[datum]['2. high'];
+              var high2dec  = parseFloat(high).toFixed(2);
+              var low       = datums[datum]['3. low'];
+              var low2dec   = parseFloat(low).toFixed(2);
+              var close     = datums[datum]['4. close'];
+              var close2dec = parseFloat(close).toFixed(2);
+              var dividend  = datums[datum]['7. dividend amount'];
+              var divfl     = parseFloat(dividend);
+              var div2dec   = parseFloat(dividend).toFixed(2);
+              var adjclose  = datums[datum]['5. adjusted close'];
+              var adjc2dec  = parseFloat(adjclose).toFixed(2);
+
+              var aclose    = "";
+              if (close2dec === adjc2dec)
+              {
+                aclose += "-";
+              }
+              else
+              {
+                aclose += adjc2dec;
+              }
+
+              var ddiv      = "";
+              if (divfl    == 0)
+              {
+                ddiv += "-";
+              }
+              else
+              {
+                ddiv += div2dec;
+              }
+
+              outputDetail +=
+                '<span>' + datum     + '</span>' +
+                '<span>' + low2dec   + '</span>' +
+                '<span>' + high2dec  + '</span>' +
+                '<span>' + open2dec  + '</span>' +
+                '<span>' + close2dec + '</span>' +
+                '<span>' + aclose    + '</span>' +
+                '<span>' + ddiv      + '</span>' +
+                '<span></span>';
+
+              if (cnt >= MAX_DAYS_ON_CHART)
+              {
+                break;
+              }
+
+              cnt += 1;
+            }
+
+            outputDetail +=
+              '</span>';
+
+//bepaal de maandag van de huidige week (eerste dag beursweek)
+            var zdag = moment.tz().day(0);
+              //volgens de locale komt zondag overeen met weekdag 1
+              //en heeft dus index = 0
+            if (moment.tz().weekday = 0)
+            {
+              var mdag = zdag.subtract(6, 'days');
+              //op deze zondag is de maandag dan 6 dagen eerder;
+              //1 dag na de zondag is maandag van de VOLGENDE week;
+            }
+            else
+            {
+              var mdag = zdag.add(1, 'days');
+              //vanaf maandag is de maandag 1 dagen verder dan de zonag;
+              //1 dag na de zondag is maandag van DEZE week;
+            }
+
+            cnt = 1;
+            var monArray = [];
+            while (cnt <= MAX_DAYS_ON_CHART + 6)
+            //leg een array aan van maandagen binnen de plage van de grafiek
+            //wordt gebruikt om de gridlines van de h-axis te bepalen
+            {
+              monArray.unshift(new Date(mdag.format("YYYY-MM-DD")));
+              console.log(mdag.format("YYYY-MM-DD"));
+              mdag.subtract(7, 'days');
+                //bepaal de vorige maandag
+              cnt += 7;
+            }
+
+            console.log(monArray);
+//
+// Google Candlesticks Chart BEGIN
+//
+            google.charts.load('current', {'packages':['corechart'], 'language': 'nl-BE'});
+            google.charts.setOnLoadCallback(drawChartCandles);
+
+            function drawChartCandles()
+            {
+
+              // Create the data table.
+              var dataCandles = new google.visualization.DataTable();
+
+              dataCandles.addColumn('date', 'Datum');
+              dataCandles.addColumn('number', 'Low');
+              dataCandles.addColumn('number', 'Open');
+              dataCandles.addColumn('number', 'Close');
+              dataCandles.addColumn('number', 'High');
+              // A column for custom tooltip content
+              dataCandles.addColumn({type: 'string', role: 'tooltip', p: {html: true}});
+
+              var coordArr = [];
+              var cnt = 1;
+              var datum = "";
+              for (datum in datums)
+              {
+                var coord = [];
+                var openFloat  = parseFloat(datums[datum]['1. open']);
+                var highFloat  = parseFloat(datums[datum]['2. high']);
+                var lowFloat   = parseFloat(datums[datum]['3. low']);
+                var closeFloat = parseFloat(datums[datum]['4. close']);
+
+                //convert datum to date-format
+                var dt = new Date(datum);
+
+                coord.push(dt);                //column 0, X-ax, date
+                coord.push(lowFloat);          //column 1, low of the day
+                coord.push(openFloat);         //column 2, Open of the day
+                coord.push(closeFloat);        //colums 3, Close of the day
+                coord.push(highFloat);         //colums 4, High of the day
+                //A column for custom tooltip content
+                var tooltip = '<table class="tooltiptext">' +
+                                '<tr>' +
+                                  '<td><span class="bold">' + datum + '</span></td>' +
+                                '</tr>' +
+                                '<tr>' +
+                                  '<td style="width:5em;height:1em">' +
+                                    '<span class="bold">' + 'O: ' + '</span>' +
+                                      openFloat.toFixed(2) +
+                                  '</td>' +
+                                  '<td style="width:5em;height:1em">' +
+                                    '<span class="bold">' + 'C: ' + '</span>' +
+                                      closeFloat.toFixed(2) +
+                                  '</td>' +
+                                '<tr>' +
+                                  '<td style="width:5em;height:1em">' +
+                                    '<span class="bold">' + 'L: ' + '</span>' +
+                                      lowFloat.toFixed(2) +
+                                  '</td>' +
+                                  '<td style="width:5em;height:1em">' +
+                                    '<span class="bold">' + 'H: ' + '</span>' +
+                                      highFloat.toFixed(2) +
+                                  '</td>' +
+                                '</tr>' +
+                              '</table>';
+
+              //coord.push({type: 'string', role: 'tooltip'});
+                coord.push(tooltip);           //colums 5, tooltip role
+                coordArr.unshift(coord);
+
+                if (cnt >= MAX_DAYS_ON_CHART)
+                {
+                  break;
+                }
+
+                cnt += 1;
+              }
+              dataCandles.addRows(coordArr);
+
+              var optionsCandles =
+              {
+                axisTitlesPosition: 'out',    //works
+              //backgroundColor: ,            //works
+                backgroundColor:
+                {
+                  stroke: 'black',          //works
+                  strokeWidth: '1',         //works
+                  fill: COLOR_BG_PAGEAREA   //works
+                },
+                bar:
+                {
+                  groupWidth: '80%'         //works
+                },
+                candlestick:
+                {
+                  fallingColor:
+                  {
+                    fill: 'red',              //works
+                    stroke: 'red',            //works
+                    strokeWidth: '2'          //works
+                  },
+                  risingColor:
+                  {
+                    fill: 'green',            //works
+                    stroke: 'green',          //works
+                    strokeWidth: '2'          //works
+                  }
+                },
+                chartArea:
+                {
+                  top:'10%',                //works
+                  left:'10%',               //works
+                  width:'87%',              //works
+                  height:'80%',             //works
+                  backgroundColor: COLOR_BG_CHARTAREA  //works
+                },
+                colors: ['black'],          //color for the wicks
+              //forceIFrame: 'true',          //works
+                hAxis:
+                {
+                //baseline: 2018-07-01,
+                //baselineColor: 'purple',
+                  direction: '1',                     //works
+                  format:"dd-MM",                     //works
+                  ticks: monArray,
+                //gridlines:
+                // {
+                //   color: COLOR_GRIDLINES,           //works
+                //   count: -1,                        //works
+                //   units:
+                //   {
+                //     days:  {format: ['dd']},
+                //     months:{format: ['MMM']},
+                //     years: {format: ['yy']}
+                //   }
+                // }
+                },
+                //forceIFrame: 'true',                    //works
+                height: HEIGHT_300,                     //works
+                legend: "none",                         //works
+                title: symbol + ", daily" +             //works
+                        ", last updated: " +
+                        last + " " + timeZone,
+                tooltip:
+                {
+                //ignoreBounds: true,                   //works
+                  isHtml: true,                         //works
+                //showColorCode: true,                  //works
+                  trigger: 'focus'                      //works
+                },
+                vAxis:
+                {
+                //baseline: '2018-07-01',
+                //baselineColor: 'purple',
+                  direction: '1',             //works
+                  format:'$#,###',            //works
+                  gridlines:
+                  {
+                    color: COLOR_GRIDLINES,   //works
+                    count: 6,                 //works
+                  },
+                  minorGridlines:
+                  {
+                    color: COLOR_MINOR_GRIDLINES,       //works
+                    count: 2,                           //works
+                  },
+                  title: "Price (in $)",                //works
+                  titleTextStyle:
+                  {
+                    color: 'black',                     //works
+                    italic: false,                      //works
+                    bold: true,                         //works
+                  }
+                },
+                width: WIDTH_100_PC                     //works
+              };
+
+              var chartCandle= new google.visualization.CandlestickChart(
+              document.getElementById('chart_div'));
+
+              google.visualization.events.addListener(chartCandle, 'ready',
+                function ()
+                {
+                  chartCandle.setSelection([{row:MAX_DAYS_ON_CHART-1, column:1}]);
+                    // Select one of the points.
+                });
+
+              chartCandle.draw(dataCandles, optionsCandles);
+              document.getElementById('png').outerHTML =
+                '<a id="downloadtekst" href="' + chartCandle.getImageURI() + '" target="_blank">Daily Candesticks</a>' + ' ' +
+                '<a id="fa_icon"  href="' + chartCandle.getImageURI() + '" target="_blank">' + '<i class="fa fa-line-chart"></i></a>';
+            }
+// Google Candlestick END
+            document.getElementById('symbolMeta').innerHTML = outputMeta;
+            document.getElementById('symbolGlobal').innerHTML = outputGlobal;
+            document.getElementById('symbolDetail').innerHTML = outputDetail;
+            document.getElementById('symbolChart').innerHTML = outputChartHeader;
+            document.getElementById('symbolOverview').innerHTML = outputOverviewHeader;
+          }
+        }
+      });
+      dataAaTSDA.send();
+    }
+
+    function loadSector()
+    {
+      console.log(">>>>>>loadSector");
+
+      var dataAaSector;
+      dataAaSector = new XMLHttpRequest();
+
+      dataAaSector.addEventListener("readystatechange", function()
+        { log(dataAaSector, ">>>readystatechange") });
+      dataAaSector.addEventListener("loadstart", function(ev)
+        { log(dataAaSector, ">>>loadstart", ev.lengthComputable + " / " + ev.loaded + " of " + ev.total) });
+      dataAaSector.addEventListener("progress", function(ev)
+        { log(dataAaSector, ">>>progress", ev.lengthComputable + " / " + ev.loaded + " of " + ev.total) });
+      dataAaSector.addEventListener("abort", function()
+        { log(dataAaSector, ">>>abort") });
+      dataAaSector.addEventListener("error", function()
+        { log(dataAaSector, ">>>error") });
+      dataAaSector.addEventListener("timeout", function(ev)
+        { log(dataAaSector, ">>>timeout", ev.lengthComputable + "/" + ev.loaded + " of " + ev.total) });
+      dataAaSector.addEventListener("loadend", function(ev)
+        { log(dataAaSector, ">>>loadend", ev.lengthComputable + "/" + ev.loaded + " of " + ev.total) });
+
+      dataAaSector.open('GET',
+           'https://www.alphavantage.co/query?function=SECTOR&apikey=VXVZ832BHZSU19JR',
+           true);
+
+      log(dataAaSector, ">>>open (GET)");
+
+      dataAaSector.addEventListener("load", function()
+      {
+        log(dataAaSector, ">>>load");
+
+        if (this.status == HTTP_STATUS_OK &&
+            this.readyState == READYSTATE_DONE)
+        {
+// haal gegevens op uit JSON-file
+          var geg  = JSON.parse(this.responseText);
+          console.log(geg);
+          if (geg.hasOwnProperty('Information'))
+          {
+            document.getElementById('symbolMeta').innerHTML = ">>> " + geg['Information'];
+            document.getElementById('symbolGlobal').innerHTML = "";
+            document.getElementById('symbolDetail').innerHTML = "";
+            document.getElementById('symbolChart').innerHTML = "";
+            document.getElementById('symbolOverview').innerHTML = "";
+            document.getElementById('chart_div').outerHTML= "<span id='chart_div'></span>";
+          }
+          else if (geg.hasOwnProperty('Error Message'))
+          {
+            document.getElementById('symbolMeta').innerHTML = ">>> " + geg['Error Message'];
+            document.getElementById('symbolGlobal').innerHTML = "";
+            document.getElementById('symbolDetail').innerHTML = "";
+            document.getElementById('symbolChart').innerHTML = "";
+            document.getElementById('symbolOverview').innerHTML = "";
+            document.getElementById('chart_div').outerHTML= "<span id='chart_div'></span>";
+          }
+          else
+          {
+            document.getElementById('chart_div').outerHTML= "<span id='chart_div'></span>";
+            var info = geg['Meta Data']['Information'];
+            var tempLast = geg['Meta Data']['Last Refreshed'];
+              //fomat     "04:20 PM ET 08/03/2018"
+              //position   0         1         2
+              //           0123456789012345678901
+            var sectoren1M = geg['Rank D: 1 Month Performance'];
+// leg bijkomende variabelen aan
+            var timeZone = "US/Eastern";
+              // is not given by the JSON here (as is the case with Daily)
+            var lDate = tempLast.substr(12,10); // format MM/DD/YYYY
+            var lTime = tempLast.substr(0,8);   // format 09:00 PM
+            var last  = lDate + " " + lTime;
+              // format MM/DD/YYYY hh:mm PM
+            console.log(last);
+// bereken datums in de verschillende tijdzones om in de Meta header
+// te vermelden (en in de logging om te kunnen debuggen)
+            var usEastern = moment.tz(last, "MM/DD/YYYY hh:mm A", timeZone);
+              // lees datum in als US/Eastern Time
+              // aan de hand van @last en @timeZone uit JSON
+            if (usEastern.isValid())
+            {
+              console.log("Input time US/ET       : ", usEastern.format("ddd MMM DD YYYY HH:mm:ss ZZ"));
+              console.log("Input time UTC         : ", usEastern.utc().format("ddd MMM DD YYYY HH:mm:ss ZZ"));
+              var brussels   = usEastern.clone().tz("Europe/Brussels");
+                // Converteer de datum naar Brussel IN EEN KOPIE
+              console.log("Input time Brussels    : ", brussels.format("ddd MMM DD YYYY HH:mm:ss ZZ"));
+              console.log("Local timezone         : ", moment.tz.guess());
+              var local = usEastern.clone().tz(moment.tz.guess());
+                // Detecteer de locale settings van de gebruiker / server
+                // Converteer de datum naar lokale tijd IN EEN KOPIE
+              console.log("Input local timeout    : ", local.format("ddd MMM DD YYYY HH:mm:ss ZZ"));
+              console.log("Current time local     : ", moment().format("ddd MMM DD YYYY HH:mm:ss ZZ"));
+            };
+
+            var outputChartHeader = '';
+            outputChartHeader +=
+              '<span id="png">' +
+              '</span>';
+
+            var outputOverviewHeader = '';
+            outputOverviewHeader +=
+              '<span id="dvjson">' +
+              '</span>';
+              // '<a id="downloadtekst" href="#">' +
+              //   'Overview US Sector Performance' +
+              // '</a>' +
+              // '<a id="fa_icon" href="#"' +
+              //   '<i class="fa fa-file-excel-o">' +
+              //   '</i>' +
+              // '</a>';
+              //       //icoon geeft een excel-bestand weer en is aanklikbaar om de csv-download te starten
+
+            var outputMeta = '';
+            outputMeta +=
+              '<span class="symbolMeta">' +
+                '<ul>' +
+                  '<li>' +
+                    '<span>Information: </span>' + info +
+                  '</li>' +
+                  '<li>'+
+                    '<span>Last update (input Alphavantage): </span>' + local.format("DD-MM-YYYY HH:mm:ss") +
+                  '</li>' +
+                  '<li>' +
+                    '<span>Last screen refresh: </span>' + moment().format("DD-MM-YYYY HH:mm:ss") +
+                  '</li>'
+                '</ul>' +
+              '</span>';
+
+            var outputGlobal = '';
+            outputGlobal +=
+              '<span class="symbolGlobal normal">' +
+                '<ul>' +
+                  '<li>' +
+                    info + '<span>, 1 Month Performance</span>' +
+                  '</li>' +
+                '</ul>' +
+              '</span>'
+//
+//use of grid (CSS) to format table of detailed information
+//instead of table (HTML)
+//
+//---revisited till here------------------------------
+            var outputDetail = '';
+            outputDetail +=
+              '<span id="titelContainerSector">' +
+                '<span>Sector</span>'       +
+                '<span>Percentage</span>'   +
+              '</span>'                     +
+              '<span id="wrapperSector">';
+
+            var csvData = [];
+            var sector = "";
+            var csvRowObj = {};
+            for (sector in sectoren1M)
+            {
+              var perc = sectoren1M[sector];
+              outputDetail +=
+                '<span class="wrSector">' + sector + '</span>' +
+                '<span class="wrPerc">'   + perc   + '</span>';
+
+              csvRowObj = {sector: sector, percentage: perc};
+              csvData.push(csvRowObj);
+            }
+
+            outputDetail +=
+              '</span>';
+//----------------------------------------------------
+            //Load the Visualization API and the corechart package.
+            google.charts.load('current', {'packages':['corechart'], 'language': 'nl-BE'});
+            // Set a callback to run when the Google Visualization API is loaded.
+            google.charts.setOnLoadCallback(drawChartPie);
+
+            // Callback that creates and populates a data table,
+            // instantiates the pie chart, passes in the data and
+            // draws it.
+            function drawChartPie()
+            {
+              // Create the data table.
+              var dataPie = new google.visualization.DataTable();
+
+              dataPie.addColumn('string', 'Sector');
+              dataPie.addColumn('number', 'Return');
+
+              var coordArr = [];
+              var cnt = 0;
+              var sector = "";
+              for (sector in sectoren1M)
+              {
+                var percFloat = parseFloat(sectoren1M[sector]);
+
+                if (percFloat <= 0)
+                {
+                  percFloat = 0;
+                }
+
+                var coord = [];
+                coord.push(sector);
+                coord.push(percFloat);
+                coordArr.push(coord);
+
+                cnt += 1;
+              }
+
+              dataPie.addRows(coordArr);
+              // Set chart options
+              var optionsPie =
+              {
+                backgroundColor:
+                  {
+                    stroke: 'black',                    //works
+                    strokeWidth: '1',                   //works
+                    fill: COLOR_BG_PAGEAREA             //works
+                  },
+                chartArea:
+                  {
+                    top:'10%',                          //works
+                    left:'10%',                         //works
+                    width:'87%',                        //works
+                    height:'80%',                       //works
+                    backgroundColor: COLOR_BG_CHARTAREA //works
+                  },
+                //colors: ['black','red'],                //works
+                height: HEIGHT_300,                     //works
+                legend:
+                  {
+                    position: 'right',                    //works
+                    textStyle:
+                      {
+                        color: 'blue'                       //works
+                      }
+                  },
+                pieSliceBorderColor: "white",           //works
+                pieSliceText: "percentage",             //works
+                pieStartAngle: 30,                       //works
+                pieResidueSliceColor: COLOR_GRIDLINES,  //works
+                pieResidueSliceLabel: 'Other',          //works
+                slices: [
+                        {offset: 0.07}, {offset: 0.05}, {offset: 0.03},
+                        {},{},{},{},{},{},{},{}
+                      ],
+                sliceVisibilityThreshold: 1/11,         //works
+                title:'1-Month Return per US-sector',
+                tooltip:
+                {
+                  showColorCode: true,
+                  trigger: 'focus'
+                },
+                width: WIDTH_100_PC
+              };
+
+              // Instantiate and draw our chart, passing in some options.
+              var chartPie= new google.visualization.PieChart(
+              document.getElementById('chart_div'));
+
+              google.visualization.events.addListener(chartPie, 'ready',
+                function ()
+                {
+                  chartPie.setSelection([{row:0}]); // Select one of the points.
+                });
+
+              chartPie.draw(dataPie, optionsPie);
+              document.getElementById('png').outerHTML =
+                '<a id="downloadtekst" href="' + chartPie.getImageURI() + '" target="_blank">Piechart US Sector Performance</a>' + ' ' +
+                '<a id="fa_icon"  href="' + chartPie.getImageURI() + '" target="_blank">' + '<i class="fa fa-download"></i></a>';
+            }
+            document.getElementById('symbolMeta').innerHTML = outputMeta;
+            document.getElementById('symbolGlobal').innerHTML = outputGlobal;
+            document.getElementById('symbolDetail').innerHTML = outputDetail;
+            document.getElementById('symbolChart').innerHTML = outputChartHeader;
+            document.getElementById('symbolOverview').innerHTML = outputOverviewHeader;
+            document.getElementById('dvjson').outerHTML =
+              '<a id="downloadtekst" href="#"></a>' + ' ' +
+              '<a id="fa_icon" href="#"><i class="fa fa-file-excel-o"></i></a>';
+
+            JSONToCSVConvertor(csvData, '1-Month Sector Analysis', true);
+          }
+        }
+      });
+      dataAaSector.send();
+    }
+  </script>
+</body>
+</html>
