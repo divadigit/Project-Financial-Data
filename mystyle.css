@@ -183,7 +183,6 @@ td, th {
  'ttl ttl ttl ttl ttl ttl ttl'*/
   grid-template-rows: repeat(auto-fill, minmax(30px, 1fr));
   grid-template-columns: 110px repeat(6, 1fr) 20px;
-  /*grid-template-columns: minmax(110px, 2fr) repeat(auto-fill, minmax(60px, 1fr)) 20px;*/
   background-color: Gainsboro;
   border-top: 1px solid black;
   border-left: 1px solid black;
