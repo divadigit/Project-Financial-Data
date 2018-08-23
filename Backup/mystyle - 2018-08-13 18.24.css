@@ -1,0 +1,308 @@
+
+* {
+    box-sizing: border-box;
+    /* with border-box, actual height = height, */
+    /* and not height + border + padding        */
+  }
+
+  /* unvisited link */
+ a#downloadtekst:link {
+     color: black;
+     background-color: white;
+     text-decoration: none;
+ }
+
+ a#downloadicon:link {
+     color: red;
+     background-color: white;
+     text-decoration: none;
+ }
+
+ /* visited link */
+ a#downloadtekst:visited {
+     color: black;
+     background-color: white;
+     text-decoration: none;
+ }
+
+ a#downloadicon:visited {
+     color: red;
+     background-color: white;
+     text-decoration: none;
+ }
+
+ /* mouse over link */
+ a#downloadtekst:hover {
+     color: white;
+     background-color: black;
+     text-decoration: none;
+ }
+
+ a#downloadicon:hover {
+     color: white;
+     background-color: red;
+     text-decoration: none;
+ }
+
+ /* selected link */
+ a#downloadtekst:active {
+     color: white;
+     background-color: grey;
+     text-decoration: none;
+ }
+
+ a#downloadicon:active {
+     color: white;
+     background-color: orange;
+     text-decoration: none;
+ }
+
+.bold {
+    font-weight: bold;
+  }
+
+.normal {
+    font-weight: normal;
+  }
+
+.underline {
+    text-decoration: underline;
+  }
+
+.widthcolumn60perc {
+    width: 60%;
+  }
+
+.widthcolumn33perc {
+    width: 33%;
+  }
+
+.widthcolumn50perc {
+    width: 50%;
+  }
+
+.widthcolumn40perc {
+    width: 40%;
+  }
+
+.widthcolumn49perc {
+    width: 49%;
+  }
+
+.widthcolumn100perc {
+    width: 100%;
+  }
+
+.widthcolumn2perc {
+    width: 2%;
+  }
+
+table {
+    height: auto;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+thead .noborder, tbody .noborder{
+    border: none;
+  }
+
+table .border, thead .border, th .border{
+  border: 1px solid black;
+}
+
+td .border{
+  border-left: 1px solid black;
+}
+
+td, th {
+  text-align: left;
+}
+
+.alignright {
+      text-align: right;
+}
+
+.centered {
+      text-align: center;
+}
+
+.symbolMeta{
+    display: flex;
+    flex-wrap: nowrap;
+    background:white;
+    padding:5px;
+    margin-bottom:10px;
+    background-color: tomato;
+    color: white;
+  }
+
+.symbolMeta ul{
+    list-style: none;
+  }
+
+.symbolGlobal{
+    display: flex;
+    flex-wrap: nowrap;
+    background:white;
+    padding:5px;
+    margin-bottom:10px;
+    background-color: blue;
+    color: white;
+  }
+
+.symbolGlobal ul{
+    list-style: none;
+  }
+
+/*.symbolDetail{
+    display: flex;
+    flex-wrap: nowrap;
+    background:Gainsboro;
+    padding:5px;
+    margin-bottom:10px;
+  }*/
+
+.colorheader{
+    background:Gainsboro;
+  }
+
+.chart_div{
+    display: flex;
+    flex-wrap: nowrap;
+  }
+
+.symbolDetail ul{
+    list-style: none;
+  }
+
+.column {
+    float: left;
+    padding: 10px;
+    height:100%;
+    background-color:Gainsboro;
+  }
+
+.row {
+    height: 300px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+
+.rowdatachart {
+      display: flex;
+      justify-content: center;
+  }
+
+.columndatachart {
+      float: left;
+      height: 100%;
+      background-color:Gainsboro;
+  }
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+.google-visualization-tooltip .tooltiptest {
+    border: solid 1px #bdbdbd;
+    position: absolute;
+    border-radius: 12px !important;
+    background-color: white;
+    box-shadow: 0px 2px 2px 0px rgba(204, 204, 204, 0.6);
+    font-size: 12px;
+    padding: 0px;
+    -webkit-box-shadow: 0px 2px 2px 0px rgba(204, 204, 204, 0.6);
+    z-index: 10000;
+  }
+
+.google-visualization-tooltip .tooltiptest > ul > li {
+  color: yellow !important;
+  background-color: lightblue !important;
+}
+
+*.google-visualization-tooltip .tooltiptext::after {
+      content: " ";
+      position: absolute;
+      top: 100%; /* At the bottom of the tooltip
+/*      left: 50%;
+/*      margin-left: -5px;
+/*      border-width: 5px;
+/*      border-style: solid;
+/*      border-color: black transparent transparent transparent; */
+}
+
+#titelcontainer {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  grid-template-rows: 30px;
+  grid-template-columns: 110px repeat(6, 1fr) 20px;
+  background-color: Gainsboro;
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  font-weight: bold;
+}
+
+#container {
+  display: grid;
+  grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));
+  grid-template-columns: 110px repeat(6, 80px);
+  overflow: auto;
+  max-height:270px;
+  border: 1px solid black;
+}
+
+#wrapper {
+  display: grid;
+  grid-template-areas:
+    'ttl ttl ttl ttl ttl ttl ttl'
+    'dtm low hgh opn cls acl dvd';
+  grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));
+  grid-template-columns: 110px repeat(6, 80px);
+  overflow: auto;
+  max-height:270px;
+  border: 1px solid black;
+}
+
+#wrapper > :first-child {
+  display: grid;
+  justify-content: center;
+  vertical-align: middle;
+  align-self: center;
+  /*border: 1px solid black;*/
+}
+
+#wrapper > :not(:first-child) {
+  display: grid;
+  justify-content: center;
+  align-content: stretch;
+  /*border: 1px solid black;*/
+}
+
+/* .itemtitle {
+    grid-area: ttl;
+    background-color: #8ca0ff;
+} */
+
+/* .itemdatum {
+  display: grid;
+  justify-content: center;
+  vertical-align: middle;
+  align-self: center;
+  /*border: 1px solid black;
+} */
+
+#titelcontainer > div {
+  display: grid;
+  justify-content: center;
+  vertical-align: middle;
+  align-self: center;
+  /*border: 1px solid black;*/
+}

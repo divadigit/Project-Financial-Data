@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script
+			  src="https://code.jquery.com/jquery-3.2.0.js"
+			  integrity="sha256-wPFJNIFlVY49B+CuAIrDr932XSb6Jk3J1M22M3E2ylQ="
+			  crossorigin="anonymous">
+  </script>
+	<script type="text/javascript"
+          src='excelexportjs.js'>
+  </script>
+</head>
+
+<body>
+
+  <div id="dvjson"></div>
+
+  <script>
+	   var data =
+        [{"firstName":"John", "lastName":"Doe"},
+	      {"firstName":"Anna", "lastName":"Smith"},
+	      {"firstName":"Peter", "lastName":"Jones"}];
+
+	   // $("#dvjson").excelexportjs({
+	   //    containerid: "dvjson",
+	   //    datatype: 'json',
+	   //    dataset: data,
+     //    columns: getColumns(data)});
+
+        var x = $("#dvjson").excelexportjs({containerid: "dvjson", datatype: 'json', dataset: data, columns: getColumns(data)})
+
+        document.getElementById('dvjson').outerHTML =
+         '<a id="downloadtekst" href="' + x +
+         '" target="_blank">Overview US Sector Performance</a>' +
+         '<a id="fa_icon" href="#"' +
+            '<i class="fa fa-file-excel-o">' +
+            '</i>' +
+          '</a>';
+
+  </script>
+</body>

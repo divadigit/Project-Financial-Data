@@ -4,10 +4,6 @@
     /* and not height + border + padding        */
   }
 
-#downloadtekst {
-    font-weight: bold;
-}
-
   /* unvisited link */
  a#downloadtekst:link {
      color: black;
@@ -15,7 +11,13 @@
      text-decoration: none;
  }
 
- a#fa_icon:link {
+ a#downloadicon:link {
+     color: red;
+     background-color: white;
+     text-decoration: none;
+ }
+
+ a#charticon:link {
      color: red;
      background-color: white;
      text-decoration: none;
@@ -28,7 +30,13 @@
      text-decoration: none;
  }
 
- a#fa_icon:visited {
+ a#downloadicon:visited {
+     color: red;
+     background-color: white;
+     text-decoration: none;
+ }
+
+ a#charticon:visited {
      color: red;
      background-color: white;
      text-decoration: none;
@@ -41,7 +49,13 @@
      text-decoration: none;
  }
 
- a#fa_icon:hover {
+ a#downloadicon:hover {
+     color: white;
+     background-color: red;
+     text-decoration: none;
+ }
+
+ a#charticon:hover {
      color: white;
      background-color: red;
      text-decoration: none;
@@ -54,7 +68,13 @@
      text-decoration: none;
  }
 
- a#fa_icon:active {
+ a#downloadicon:active {
+     color: white;
+     background-color: orange;
+     text-decoration: none;
+ }
+
+ a#charticon:active {
      color: white;
      background-color: orange;
      text-decoration: none;
@@ -68,28 +88,39 @@
     font-weight: normal;
 }
 
+.widthcolumn50perc {
+    width: 50%;
+  }
+
+.widthcolumn40perc {
+    width: 40%;
+  }
+
 .widthcolumn49perc {
     width: 49%;
+  }
+
+.widthcolumn100perc {
+    width: 100%;
   }
 
 .widthcolumn2perc {
     width: 2%;
   }
 
-/* table, thead, tbody, td, th only used for tiptools Google Charts */
 table {
     height: auto;
     border-collapse: collapse;
     width: 100%;
   }
 
-/*thead .noborder, tbody .noborder{
+thead .noborder, tbody .noborder{
     border: none;
-  }*/
+  }
 
-/*table .border, thead .border, th .border{
+table .border, thead .border, th .border{
   border: 1px solid black;
-}*/
+}
 
 td .border{
   border-left: 1px solid black;
@@ -98,7 +129,6 @@ td .border{
 td, th {
   text-align: left;
 }
-/* table, thead, tbody, td, th only used for tiptools Google Charts */
 
 .alignright {
       text-align: right;
@@ -108,32 +138,12 @@ td, th {
       text-align: center;
 }
 
-#button1, #button2 {
-    background-color:  #64b5f6;
-    border: none;
-    color: white;
-    cursor: pointer;
-}
-
-#button1:focus, #button2:focus {
-    background-color:  #1e88e5;
-}
-
-#button1:hover, #button2:hover {
-    background-color:  #0d47a1;
-}
-
-/* #button1:active, #button2:active {
-    box-shadow: inset -2px -2px 3px rgba(255, 255, 255, .6),
-                inset 2px 2px 3px rgba(0, 0, 0, .6);
-} */
-
 .symbolMeta{
     display: flex;
     flex-wrap: nowrap;
     background:white;
-    padding:2px;
-    margin-bottom:5px;
+    padding:5px;
+    margin-bottom:10px;
     background-color: tomato;
     color: white;
   }
@@ -143,15 +153,15 @@ td, th {
   }
 
 .symbolMeta > ul > li > span {
-    font-weight:bold;
+    font-weight:bold;bold"
 }
 
 .symbolGlobal{
     display: flex;
     flex-wrap: nowrap;
     background:white;
-    padding:2px;
-    margin-bottom:5px;
+    padding:5px;
+    margin-bottom:10px;
     background-color: blue;
     color: white;
   }
@@ -177,10 +187,42 @@ td, th {
     list-style: none;
   }
 
-#titelContainerDaily {
+.column {
+    float: left;
+    padding: 10px;
+    height:100%;
+    background-color:Gainsboro;
+  }
+
+.row {
+    height: 300px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+
+.rowdatachart {
+      display: flex;
+      justify-content: center;
+  }
+
+.columndatachart {
+      float: left;
+      height: 100%;
+      background-color:Gainsboro;
+  }
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+#titelcontainer {
   display: grid;
-/*grid-template-areas:
- 'ttl ttl ttl ttl ttl ttl ttl'*/
+  /*justify-content: center;*/
+  /*vertical-align: middle;*/
   grid-template-rows: repeat(auto-fill, minmax(30px, 1fr));
   grid-template-columns: 110px repeat(6, 1fr) 20px;
   background-color: Gainsboro;
@@ -190,104 +232,53 @@ td, th {
   font-weight: bold;
 }
 
-#titelContainerDaily > span {
+#titelcontainer > div {
   display: grid;
   justify-content: center;
   vertical-align: middle;
   align-self: center;
 }
 
-#titelContainerSector {
+#wrapper {
   display: grid;
-/*grid-template-areas:
- 'ttl ttl lft'*/
-  grid-template-rows: repeat(auto-fill, minmax(30px, 1fr));
-  grid-template-columns: 250px 1fr;
-  background-color: Gainsboro;
-  border-top: 1px solid black;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
-  font-weight: bold;
-}
-
-#titelContainerSector > span {
-  display: grid;
-  justify-content: center;
-  vertical-align: middle;
-  align-self: center;
-}
-
-#wrapperDaily {
-  display: grid;
-  grid-template-areas:
-    'dtm low hgh opn cls acl dvd lft';
+  /* grid-template-areas:
+    'ttl ttl ttl ttl ttl ttl ttl'
+    'dtm low hgh opn cls acl dvd'; */
   grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));
-  grid-template-columns: 110px repeat(6, 1fr) 20px;
+  grid-template-columns: 110px repeat(6, 80px);
   overflow: auto;
   max-height:270px;
   border: 1px solid black;
 }
 
-#wrapperDaily > span {
+#wrapper > div {
   display: grid;
   justify-content: center;
   vertical-align: middle;
   align-self: center;
 }
 
-.wrSector {
-  text-align: left;
-  padding-left: 20px;
+.loButtons {
+    grid-area: btns;
 }
 
-.wrPerc {
-  display: block;
-  text-align: right;
-  padding-right: 130px;
+.loScreen {
+    grid-area: ft;
 }
-
-#wrapperSector {
-  display: grid;
-  /*grid-template-areas:
-    'sct prc lft';*/
-  grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));
-  grid-template-columns: 250px 1fr;
-  overflow: auto;
-  /*max-height:270px;*/
-  border: 1px solid black;
-}
-
-#wrapperSector > span {
-  display: grid;
-  vertical-align: middle;
-}
-
-.loButtons {grid-area: btns}
-.loButtons > button {width: 100%}
-.loCol1 {grid-area: col1}
-.loCol2 {grid-area: col2}
-.loTitle {grid-area: ttll}
-.loMeta {grid-area: meta}
-.loGlobal {grid-area: glob}
-.loChart {grid-area: chrt}
-.loTable {grid-area: tabl}
 
 #layout {
   display: grid;
   grid-template-areas:
-    'ttll ttll ttll'
-    'btns meta meta'
-    'btns glob glob'
-    'btns col1 col2'
-    'btns chrt tabl';
-  /*grid-template-rows: 65px 65px 65px 65px 1fr;*/
-  grid-template-columns: 100px repeat(2, 1fr);
-  grid-column-gap: 1%;
+    'btns scrn';
+  grid-template-rows: auto;
+  grid-template-columns: 60px auto;
+  overflow: auto;
   max-height: none;
-  vertical-align: middle;
 }
 
-#layout > span {
+#layout > div {
   display: grid;
+  justify-content: center;
   vertical-align: middle;
+  align-self: center;
 }
